@@ -1,0 +1,7 @@
+width=10
+HEIGHT=10
+ENTRY=4,4
+EXIT=9,9
+OUTPUT_FILE= output.txt
+PERFECT=True
+seed=4
