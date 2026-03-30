@@ -18,5 +18,5 @@ clean:
 	@rm -rf .mypy_cache /.mypy_cache
 
 lint:
-	-flake8 .
-	-mypy . $(FLAGS)
+	-python3 -m flake8 .
+	-python3 -m mypy . $(FLAGS)

@@ -31,6 +31,11 @@ def draw_maze(
     cell_height = 2
     cell_width = 4
 
+    exist_42 = 1
+    if width > 9 or height > 9:
+        exist_42 = 0
+
+
     for y in range(height):
         for x in range(width):
 
@@ -50,7 +55,7 @@ def draw_maze(
                 stdscr.addstr(y * cell_height + 1, x * cell_width, " ",
                               curses.color_pair(rotate_color))
 
-            if (y, x) == entry:
+            if (x, y) == entry:
                 stdscr.addstr(y * cell_height + 1, x * cell_width + 2, "🔵",
                               curses.color_pair(1))
             if (y, x) == exit:
@@ -90,6 +95,8 @@ def draw_maze(
                   "[s/h]. Show/Hide path from entry to exit")
     stdscr.addstr((height) * cell_height + 4, 0, "[c]. Rotate maze colors")
     stdscr.addstr((height) * cell_height + 5, 0, "[b]. Back")
+    if exist_42:
+        stdscr.addstr((height) * cell_height + 8, 0, "The maze size doesn't support '42' pattern !! minimum (9, 9)", curses.color_pair(1))
 
 
 def draw_maze_game(
@@ -164,7 +171,7 @@ def draw_maze_game(
                         player_y = y
                         player_x = x
                         found_entry = 1
-                if score >= 2:
+                if score >= 3:
                     if (y, x) == exit:
                         stdscr.addstr(x * cell_height + 1, y * cell_width + 2,
                                       "🏆", curses.color_pair(2))
