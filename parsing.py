@@ -1,4 +1,5 @@
 import sys
+from typing import Dict
 
 
 def parse_config() -> dict:
@@ -14,7 +15,7 @@ def parse_config() -> dict:
             forbiden = ['config.txt', 'a_maze_ing.py', 'parsing.py',
                         'MazeGenerator.py', 'Makefile', 'README.md']
             in_file = []
-            config = {}
+            config: Dict = {}
             while True:
                 content = f.readline()
                 if not content:
@@ -42,46 +43,46 @@ def parse_config() -> dict:
                         if key in config.keys():
                             continue
                         try:
-                            value = int(value)
-                            if value <= 0:
+                            val = int(value)
+                            if val <= 0:
                                 raise ValueError()
                         except ValueError:
                             raise ValueError(
                                 f"{key} must be a positive integer !!")
                         else:
-                            config[key] = value
+                            config[key] = int(value)
                             in_file.append(key)
                     elif key == 'HEIGHT':
                         if key in config.keys():
                             continue
                         try:
-                            value = int(value)
-                            if value <= 0:
+                            val = int(value)
+                            if val <= 0:
                                 raise ValueError()
                         except ValueError:
                             raise ValueError(
                                 f"{key} must be a positive integer !!")
                         else:
-                            config[key] = value
+                            config[key] = int(value)
                             in_file.append(key)
                     elif key == 'ENTRY':
                         if key in config.keys():
                             continue
                         try:
                             entry_x, entry_y = value.split(',')
-                            entry_x = int(entry_x)
+                            entr_x = int(entry_x)
                             if 'WIDTH' not in config or 'HEIGHT' not in config:
                                 raise ValueError(
                                     "you must provide"
                                     " WIDTH and HEIGHT first !!")
-                            if entry_x >= config['WIDTH'] or entry_x < 0:
+                            if entr_x >= config['WIDTH'] or entr_x < 0:
                                 raise ValueError(
                                     "Entry is out of the maze's bounds !!")
-                            entry_y = int(entry_y)
-                            if entry_y >= config['HEIGHT'] or entry_y < 0:
+                            entr_y = int(entry_y)
+                            if entr_y >= config['HEIGHT'] or entr_y < 0:
                                 raise ValueError(
                                     "Entry is out of the maze's bounds !!")
-                            config[key] = (entry_x, entry_y)
+                            config[key] = (entr_x, entr_y)
                             in_file.append(key)
                         except Exception as e:
                             print(f"[{key}]", e)
@@ -91,19 +92,19 @@ def parse_config() -> dict:
                             continue
                         try:
                             exit_x, exit_y = value.split(',')
-                            exit_x = int(exit_x)
+                            exitt_x = int(exit_x)
                             if 'WIDTH' not in config or 'HEIGHT' not in config:
                                 raise ValueError(
                                     "you must provide"
                                     " WIDTH and HEIGHT first !!")
-                            if exit_x >= config['WIDTH'] or exit_x < 0:
+                            if exitt_x >= config['WIDTH'] or exitt_x < 0:
                                 raise ValueError(
                                     "Exit is out of the maze's bounds !!")
-                            exit_y = int(exit_y)
-                            if exit_y >= config['HEIGHT'] or exit_y < 0:
+                            exitt_y = int(exit_y)
+                            if exitt_y >= config['HEIGHT'] or exitt_y < 0:
                                 raise ValueError(
                                     "Exit is out of the maze's bounds !!")
-                            config[key] = (exit_x, exit_y)
+                            config[key] = (exitt_x, exitt_y)
                             in_file.append(key)
                         except Exception as e:
                             print(f"[{key}]", e)
@@ -150,8 +151,8 @@ def parse_config() -> dict:
                             if value == 'None':
                                 config[key] = None
                             else:
-                                value = int(value)
-                                config[key] = value
+                                val = int(value)
+                                config[key] = val
                             in_file.append(key)
                         except Exception as e:
                             print(f"[{key}]", e)

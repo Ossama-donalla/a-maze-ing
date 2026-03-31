@@ -3,15 +3,17 @@ FLAGS = --warn-return-any --warn-unused-ignores --ignore-missing-imports --disal
 MAIN = a_maze_ing.py
 CONFIG = config.txt
 
-run:
-	@$(PY) $(MAIN) $(CONFIG)
-
 install:
 	@pip install flake8
 	@pip install mypy
+	@pip install pygame
+
+run:
+	@$(PY) $(MAIN) $(CONFIG)
 
 debug:
 	@$(PY) -m pdb $(MAIN) $(CONFIG)
+
 
 clean:
 	@rm -rf *__pycache__ */__pycache__

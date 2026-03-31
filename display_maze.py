@@ -1,17 +1,23 @@
-import curses
-from curses import window
-import time
-import random
-import os
-
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
-import pygame
+try:
+    import curses
+    from curses import window
+    import time
+    import random
+    import os
+    os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
+    import pygame
+except ModuleNotFoundError as e:
+    print("Error detected at top level:", e.name)
+except Exception as e:
+    print("Error detected at top level:", e)
 
 
 check_wall = {"north": 1, "east": 2, "south": 4, "west": 8}
 
 pygame.mixer.init()
-pygame.mixer.music.load("YTDown.com_YouTube_Lost-Woods-The-Legend-of-Zelda-Ocarina-o_Media_V9so9y-8Dgk_009_128k.mp3")
+pygame.mixer.music.load(
+    "YTDown.com_YouTube_Lost-Woods-The-Legend-of-Zelda-"
+    "Ocarina-o_Media_V9so9y-8Dgk_009_128k.mp3")
 sound = pygame.mixer.Sound("videoplayback (mp3cut.net)t3am.mp3")
 sound2 = pygame.mixer.Sound("videoplayback (mp3cut.net) 4M.mp3")
 pygame.mixer.music.play(-1)
@@ -23,7 +29,19 @@ def draw_maze(
         rotate_color: int,
         blocked_42: list
         ) -> None:
+    """
+    Draw the maze in the terminal.
 
+    Args:
+        stdscr: Curses window.
+        path: Solution path.
+        config: Maze configuration.
+        entry: Entry coordinates.
+        exit: Exit coordinates.
+        show_path: Whether to display solution.
+        rotate_color: Color scheme.
+        blocked_42: Blocked cells map.
+    """
     maze = config['grid']
 
     width = config['width']
@@ -32,9 +50,8 @@ def draw_maze(
     cell_width = 4
 
     exist_42 = 1
-    if width > 9 or height > 9:
+    if width > 9 and height > 9:
         exist_42 = 0
-
 
     for y in range(height):
         for x in range(width):
@@ -58,8 +75,8 @@ def draw_maze(
             if (x, y) == entry:
                 stdscr.addstr(y * cell_height + 1, x * cell_width + 2, "🔵",
                               curses.color_pair(1))
-            if (y, x) == exit:
-                stdscr.addstr(x * cell_height + 1, y * cell_width + 2, "🏁",
+            if (x, y) == exit:
+                stdscr.addstr(y * cell_height + 1, x * cell_width + 2, "🏁",
                               curses.color_pair(2))
 
             if blocked_42[y][x] is True:
@@ -87,7 +104,7 @@ def draw_maze(
             stdscr.addstr(y * cell_height + 1, x * cell_width + 2, "⭐",
                           curses.color_pair(1))
             stdscr.refresh()
-            time.sleep(0.09)
+            time.sleep(0.04)
 
     stdscr.addstr((height) * cell_height + 1, 0, "=== A-Maze-ing ===")
     stdscr.addstr((height) * cell_height + 2, 0, "[r]. Re-generate a new maze")
@@ -96,7 +113,9 @@ def draw_maze(
     stdscr.addstr((height) * cell_height + 4, 0, "[c]. Rotate maze colors")
     stdscr.addstr((height) * cell_height + 5, 0, "[b]. Back")
     if exist_42:
-        stdscr.addstr((height) * cell_height + 8, 0, "The maze size doesn't support '42' pattern !! minimum (9, 9)", curses.color_pair(1))
+        stdscr.addstr((height) * cell_height + 8, 0,
+                      "The maze size doesn't support '42' pattern "
+                      "!! minimum (9, 9)", curses.color_pair(1))
 
 
 def draw_maze_game(
@@ -107,6 +126,20 @@ def draw_maze_game(
         rotate_color: int,
         blocked_42: list
         ) -> None:
+    """
+    Run interactive maze game.
+
+    Player moves inside the maze, collects items,
+    and tries to reach the exit.
+
+    Args:
+        stdscr: Curses window.
+        config: Maze configuration.
+        entry: Start position.
+        exit: Goal position.
+        rotate_color: Color scheme.
+        blocked_42: Blocked cells map.
+    """
     maze = config['grid']
 
     width = config['width']
@@ -165,23 +198,24 @@ def draw_maze_game(
                                   curses.color_pair(rotate_color))
 
                 if not found_entry:
-                    if (y, x) == entry:
+                    if (x, y) == entry:
                         stdscr.addstr(y * cell_height + 1, x * cell_width + 2,
                                       "🧙", curses.color_pair(1))
                         player_y = y
                         player_x = x
                         found_entry = 1
                 if score >= 3:
-                    if (y, x) == exit:
-                        stdscr.addstr(x * cell_height + 1, y * cell_width + 2,
+                    if (x, y) == exit:
+                        stdscr.addstr(y * cell_height + 1, x * cell_width + 2,
                                       "🏆", curses.color_pair(2))
                         exit_y = x
                         exit_x = y
                         stop_food = False
 
                 if stop_food:
-                    stdscr.addstr(food_y * cell_height + 1, food_x * cell_width + 2,
-                                  "💎")
+                    stdscr.addstr(
+                        food_y * cell_height + 1, food_x * cell_width + 2,
+                        "💎")
 
                 if blocked_42[y][x] is True:
                     stdscr.addstr(y * cell_height + 1, x * cell_width + 2, "⬜",

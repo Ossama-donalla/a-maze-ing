@@ -1,0 +1,17 @@
+[project]
+name = "mazegen"
+version = "1.0.0"
+description = "project's package"
+authors = [
+    {name = "akoudri"},
+    {name = "oait-all"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
