@@ -1,7 +1,11 @@
 import random
+from typing import Dict
 
 
 class MazeGenerator:
+    """
+    Class to generate and manage a maze.
+    """
     def __init__(
         self, width: int, height: int,
             seed: int | None, perfect: bool, config: dict) -> None:
@@ -18,10 +22,43 @@ class MazeGenerator:
         self.seed = seed
         self.config = config
 
+        """
+        Initialize the maze.
+
+        Args:
+            width: Maze width.
+            height: Maze height.
+            seed: Random seed.
+            perfect: If True, maze has no loops.
+            config: Configuration dictionary.
+        """
+
     def check_bounds(self, x: int, y: int) -> bool:
+        """
+        Check if coordinates are inside maze bounds.
+
+        Args:
+            x: X coordinate.
+            y: Y coordinate.
+
+        Returns:
+            True if inside bounds, otherwise False.
+        """
         return 0 <= x < self.width and 0 <= y < self.height
 
     def open_between(self, x1: int, y1: int, x2: int, y2: int) -> None:
+        """
+        Open a path between two neighboring cells.
+
+        Args:
+            x1: X of first cell.
+            y1: Y of first cell.
+            x2: X of second cell.
+            y2: Y of second cell.
+
+        Raises:
+            ValueError: If cells are out of bounds or not neighbors.
+        """
         if self.check_bounds(x1, y1) and self.check_bounds(x2, y2):
             if (x1 == x2 - 1) and (y1 == y2):
                 self.grid[y1][x1].open_wall("east")
@@ -41,6 +78,18 @@ class MazeGenerator:
             raise ValueError("The coordinates are out of the maze's bounds !!")
 
     def close_between(self, x1: int, y1: int, x2: int, y2: int) -> None:
+        """
+        Close the wall between two neighboring cells.
+
+        Args:
+            x1: X of first cell.
+            y1: Y of first cell.
+            x2: X of second cell.
+            y2: Y of second cell.
+
+        Raises:
+            ValueError: If cells are invalid.
+        """
         if self.check_bounds(x1, y1) and self.check_bounds(x2, y2):
             if (x1 == x2 - 1) and (y1 == y2):
                 self.grid[y1][x1].close_wall("east")
@@ -60,6 +109,21 @@ class MazeGenerator:
             raise ValueError("The coordinates are out of the maze !!")
 
     def check_connection(self, x1: int, y1: int, x2: int, y2: int) -> bool:
+        """
+        Check if two neighboring cells are connected.
+
+        Args:
+            x1: X of first cell.
+            y1: Y of first cell.
+            x2: X of second cell.
+            y2: Y of second cell.
+
+        Returns:
+            True if connected, otherwise False.
+
+        Raises:
+            ValueError: If cells are invalid.
+        """
         if self.check_bounds(x1, y1) and self.check_bounds(x2, y2):
             if (x1 == x2 - 1) and (y1 == y2):
                 if not (self.grid[y1][x1].has_wall("east")):
@@ -87,6 +151,17 @@ class MazeGenerator:
             raise ValueError("The coordinates are out of the maze !!")
 
     def get_unvisited_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
+        """
+        Get unvisited and unblocked neighbors.
+
+        Args:
+            x: X coordinate.
+            y: Y coordinate.
+
+        Returns:
+            List of neighbor coordinates.
+        """
+
         neighbors = []
 
         if self.check_bounds(x - 1, y) and not self.visited[y][x - 1]:
@@ -104,6 +179,12 @@ class MazeGenerator:
         return neighbors
 
     def forty_two_cells(self) -> None:
+        """
+        Block cells to form a '42' pattern in the maze.
+
+        Raises:
+            ValueError: If maze is too small.
+        """
         centre_x = (self.width - 1) // 2
         centre_y = (self.height - 1) // 2
         pattern_coordinates = [
@@ -140,6 +221,16 @@ class MazeGenerator:
                 "The maze size doesn't support '42' pattern !! minimum (9, 9)")
 
     def is_open_3x3_block(self, start_x: int, start_y: int) -> bool:
+        """
+        Check if a 3x3 area is fully open.
+
+        Args:
+            start_x: Starting X.
+            start_y: Starting Y.
+
+        Returns:
+            True if area is open, otherwise False.
+        """
         if start_x < 0 or start_y < 0:
             return False
         if start_x + 2 >= self.width or start_y + 2 >= self.height:
@@ -156,6 +247,12 @@ class MazeGenerator:
         return True
 
     def has_open_3x3_area(self) -> bool:
+        """
+        Check if any 3x3 open area exists.
+
+        Returns:
+            True if found, otherwise False.
+        """
         for start_y in range(self.height - 2):
             for start_x in range(self.width - 2):
                 if self.is_open_3x3_block(start_x, start_y):
@@ -165,6 +262,12 @@ class MazeGenerator:
     def get_extra_wall_candidates(
         self
          ) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+        """
+        Get walls that can be opened to create loops.
+
+        Returns:
+            List of wall candidate pairs.
+        """
         candidates = []
         for y in range(self.height):
             for x in range(self.width):
@@ -182,6 +285,12 @@ class MazeGenerator:
         return candidates
 
     def make_non_perfect(self, extra_openings: int = 5) -> None:
+        """
+        Add extra openings to create loops in the maze.
+
+        Args:
+            extra_openings: Number of openings to add.
+        """
         candidates = self.get_extra_wall_candidates()
         random.shuffle(candidates)
         opened = 0
@@ -195,6 +304,9 @@ class MazeGenerator:
                 break
 
     def generate(self) -> None:
+        """
+        Generate the maze using DFS algorithm.
+        """
         if self.seed is not None:
             random.seed(self.seed)
         stack = []
@@ -217,6 +329,12 @@ class MazeGenerator:
             self.make_non_perfect((self.width * self.height) // 12)
 
     def set_entry_exit(self) -> None:
+        """
+        Set entry and exit points.
+
+        Raises:
+            ValueError: If entry or exit is blocked.
+        """
         self.entry = self.config['ENTRY']
         self.exit = self.config['EXIT']
         if self.blocked[self.entry[1]][self.entry[0]]:
@@ -225,6 +343,16 @@ class MazeGenerator:
             raise ValueError("The cell is reserved for 42")
 
     def get_connected_neighbors(self, x: int, y: int) -> list[tuple]:
+        """
+        Get connected neighbors of a cell.
+
+        Args:
+            x: X coordinate.
+            y: Y coordinate.
+
+        Returns:
+            List of connected neighbors.
+        """
         connected = []
         try:
             if self.check_connection(x, y, x - 1, y):
@@ -249,6 +377,12 @@ class MazeGenerator:
         return connected
 
     def find_shortest_path(self) -> list[tuple[int, int]]:
+        """
+        Find shortest path from entry to exit using BFS.
+
+        Returns:
+            List of coordinates representing the path.
+        """
         start = self.entry
         end = self.exit
 
@@ -280,6 +414,18 @@ class MazeGenerator:
         return path
 
     def path_to_directions(self, path: list[tuple[int, int]]) -> str:
+        """
+        Convert path into directions (N, S, E, W).
+
+        Args:
+            path: List of coordinates.
+
+        Returns:
+            String of directions.
+
+        Raises:
+            ValueError: If path contains invalid steps.
+        """
         if not path or len(path) == 1:
             return ""
         directions = []
@@ -300,6 +446,12 @@ class MazeGenerator:
         return "".join(directions)
 
     def write_output(self, path: list[tuple]) -> None:
+        """
+        Write maze and solution to a file.
+
+        Args:
+            path: Path to write.
+        """
         grid_hex = [[format(cell.walls, 'X') for cell in row]
                     for row in self.grid]
         path_directions = self.path_to_directions(path)
@@ -312,56 +464,19 @@ class MazeGenerator:
             f.write(f"\n{path_directions}\n")
 
     def get_data(self, path: list[tuple]) -> dict:
-        data = {}
+        """
+        Export maze data.
+
+        Args:
+            path: Path to include.
+
+        Returns:
+            Dictionary containing maze data.
+        """
+        data: Dict[str, int | str | list[list]] = {}
         data['width'] = self.width
         data['height'] = self.height
         data['grid'] = [[cell.walls for cell in row]
                         for row in self.grid]
         data['path'] = self.path_to_directions(path)
         return data
-
-    def display(self, path: list[tuple[int, int]] | None = None) -> None:
-        path_set = set(path) if path else set()
-
-        top = "+"
-        for x in range(self.width):
-            if self.grid[0][x].has_wall("north"):
-                top += "---+"
-            else:
-                top += "   +"
-        print(top)
-
-        for y in range(self.height):
-            middle = ""
-            bottom = "+"
-
-            for x in range(self.width):
-                cell = self.grid[y][x]
-
-                if x == 0:
-                    if cell.has_wall("west"):
-                        middle += "|"
-                    else:
-                        middle += " "
-
-                if self.blocked[y][x]:
-                    middle += " # "
-                elif (x, y) in path_set:
-                    middle += " * "
-                elif self.visited[y][x]:
-                    middle += " . "
-                else:
-                    middle += "   "
-
-                if cell.has_wall("east"):
-                    middle += "|"
-                else:
-                    middle += " "
-
-                if cell.has_wall("south"):
-                    bottom += "---+"
-                else:
-                    bottom += "   +"
-
-            print(middle)
-            print(bottom)

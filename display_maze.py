@@ -27,7 +27,8 @@ def draw_maze(
         stdscr: window, path: list, config: dict, entry: tuple,
         exit: tuple, show_path: bool,
         rotate_color: int,
-        blocked_42: list
+        blocked_42: list,
+        one_time: bool
         ) -> None:
     """
     Draw the maze in the terminal.
@@ -55,7 +56,9 @@ def draw_maze(
 
     for y in range(height):
         for x in range(width):
-
+            if one_time:
+                stdscr.refresh()
+                time.sleep(0.02)
             # border up
             if check_wall["north"] & maze[y][x]:
                 stdscr.addstr(y * cell_height, x * cell_width, "+---",
@@ -103,8 +106,8 @@ def draw_maze(
         for x, y in path[1:len(path) - 1]:
             stdscr.addstr(y * cell_height + 1, x * cell_width + 2, "⭐",
                           curses.color_pair(1))
-            stdscr.refresh()
             time.sleep(0.04)
+            stdscr.refresh()
 
     stdscr.addstr((height) * cell_height + 1, 0, "=== A-Maze-ing ===")
     stdscr.addstr((height) * cell_height + 2, 0, "[r]. Re-generate a new maze")
@@ -208,8 +211,8 @@ def draw_maze_game(
                     if (x, y) == exit:
                         stdscr.addstr(y * cell_height + 1, x * cell_width + 2,
                                       "🏆", curses.color_pair(2))
-                        exit_y = x
-                        exit_x = y
+                        exit_y = y
+                        exit_x = x
                         stop_food = False
 
                 if stop_food:
@@ -236,7 +239,7 @@ def draw_maze_game(
         stdscr.addstr(height * cell_height, width * cell_width, "+",
                       curses.color_pair(rotate_color))
 
-        if food_y == player_y and food_x == player_x:
+        if food_y == player_y and food_x == player_x and stop_food:
             food_y = random.randint(0, height - 1)
             food_x = random.randint(0, width - 1)
             sound.play()
@@ -296,6 +299,9 @@ def draw_maze_game(
             ):
                 player_x += 1
 
+        if key == ord("b"):
+            break
         stdscr.addstr((height + 1) * cell_height, 0, f"score {score}")
+        stdscr.addstr((height + 1) * cell_height + 1, 0, "[b]. Back")
         stdscr.refresh()
         time.sleep(0.05)

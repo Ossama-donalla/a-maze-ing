@@ -96,6 +96,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(e)
             else:
+                one_time = True
                 found_player = 0
                 stdscr = curses.initscr()
                 stdscr.keypad(True)
@@ -174,7 +175,8 @@ if __name__ == "__main__":
                                     draw_maze(stdscr, path, output["output"],
                                               entry, exit, show_path,
                                               rotate_color,
-                                              output["blocked"])
+                                              output["blocked"], one_time)
+                                    one_time = False
                                 else:
                                     raise ValueError("no path !!")
                                 key = stdscr.getch()
@@ -186,9 +188,10 @@ if __name__ == "__main__":
                                     stdscr.clear()
 
                                 if key == ord('r'):
-                                    config['SEED'] = random.randint(0, 1000)
-                                    output = generate_maze()
-                                    stdscr.clear()
+                                    if not config["SEED"]:
+                                        output = generate_maze()
+                                        show_path = False
+                                        stdscr.clear()
                                 if key == ord('c'):
                                     rotate_color = random.randint(2, 7)
                                 if key == ord('b'):

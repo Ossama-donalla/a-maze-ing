@@ -1,7 +1,7 @@
 [project]
 name = "mazegen"
 version = "1.0.0"
-description = "project's package"
+description = "making this package ready for future work"
 authors = [
     {name = "akoudri"},
     {name = "oait-all"}

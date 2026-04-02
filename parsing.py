@@ -3,6 +3,48 @@ from typing import Dict
 
 
 def parse_config() -> dict:
+    """
+    Parse and validate a configuration file for maze generation.
+
+    This function reads a configuration file (`config.txt`) passed as a
+    command-line argument, validates its contents, and returns a dictionary
+    containing the parsed configuration values.
+
+    The configuration file must follow a KEY=VALUE format, with
+    optional comments starting with '#'. Mandatory keys must be present,
+    and values must respect specific constraints depending on the key.
+
+    Expected command:
+        python3 a_maze_ing.py config.txt
+
+    Supported keys:
+        - WIDTH (int): Width of the maze (must be > 0)
+        - HEIGHT (int): Height of the maze (must be > 0)
+        - ENTRY (tuple[int, int]): Entry coordinates within bounds
+        - EXIT (tuple[int, int]): Exit coordinates within bounds
+        - OUTPUT_FILE (str): Output file name
+            (must not overwrite critical files)
+        - PERFECT (bool): Whether the maze is perfect ("TRUE" or "FALSE")
+        - SEED (int | None, optional): Random seed
+
+    Returns:
+        dict: A dictionary containing validated configuration values.
+
+    Raises:
+        ValueError: If:
+            - Incorrect number of command-line arguments
+            - Invalid file name
+            - Invalid key or missing mandatory key
+            - Incorrect value format or out-of-bounds values
+            - ENTRY and EXIT are identical
+
+    Notes:
+        - Lines starting with '#' or empty lines are ignored.
+        - Inline comments (after values) are supported.
+        - Duplicate keys are ignored after first occurrence.
+        - The function exits the program on most errors
+            after printing messages.
+    """
     try:
         if len(sys.argv) != 2:
             raise ValueError("Try this : python3 a_maze_ing.py config.txt")
